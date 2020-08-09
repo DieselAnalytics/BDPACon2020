@@ -4,11 +4,11 @@ import numpy as np
 import os
 
 # Set the working directory
-os.chdir("C:/Users/ryanwade44/Documents/BDPACON2020/vscode/data")
+os.chdir("C:/Users/ryanwade44/Documents/BDPACON2020/")
 
 # Reads the contents of ACS2018_Table_Shells.csv into 
 # a pandas data frame
-dfShellData = pd.read_csv("ACS2018_Table_Shells.csv")
+dfShellData = pd.read_csv("./vscode/data/ACS2018_Table_Shells.csv")
 
 # Finds all instances in the data frame that is populated with empty
 # strings using a regular expression and replaces it with a NaN
@@ -39,4 +39,4 @@ dfShellData.columns = ["Category", "Table ID", "Variable", "Variable Description
 dfShellData.reset_index(inplace = True, drop = True)
 
 # Save the contents in the data frame to a csv file
-dfShellData.to_csv("ACS2018_Table_Shells_Reformatted.csv")
+dfShellData.to_csv("./vscode/data/ACS2018_Table_Shells_Reformatted.csv")
