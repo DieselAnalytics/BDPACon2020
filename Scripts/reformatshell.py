@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 # Set the working directory
-os.chdir("<file path to the BDPACON2020 folder>")
+os.chdir("C:/Users/ryanwade44/Documents/BDPACON2020/")
 
 # Reads the contents of ACS2018_Table_Shells.csv into 
 # a pandas data frame
