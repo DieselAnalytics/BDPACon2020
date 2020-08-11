@@ -18,8 +18,39 @@ new_names = {
     "B19113E_001E":"PACIFIC","B19113F_001E":"OTHER","B19113G_001E":"MIX",
     "B19113H_001E":"JUST WHITE","B19113I_001E":"HISPANIC"
 }
+#**********************************************************************************************************
+#**********************************************************************************************************
+#**********************************************************************************************************
 
-censusdata.printtable(censusdata.censustable('acs5', 2018))
+# Define the geographies you want data on
+geographies = [('us', '*')]
+
+# Fetch the data from the census api using the 5 year estimates for 
+# 2018 
+MEDINC_BY_US_BY_RACE = censusdata.download(
+    'acs5', 2018, censusdata.censusgeo(geographies), 
+    cns_vars)
+
+# Reest the index for the MEDINC_BY_STATE_BY_RACE data frame
+MEDINC_BY_US_BY_RACE = MEDINC_BY_US_BY_RACE.reset_index()
+
+# Rename the columns with more meaningful names
+MEDINC_BY_US_BY_RACE = MEDINC_BY_US_BY_RACE.rename(columns=new_names)
+
+# Create a function to get the location name
+def getLocation(row):
+    return row["Geography"].name
+
+# Sets the location field based on thee getLocation() field. Sets the "Place" field to the "Location" field
+MEDINC_BY_US_BY_RACE["Location"] = MEDINC_BY_US_BY_RACE.apply(lambda row:  getLocation(row),axis=1)
+MEDINC_BY_US_BY_RACE["Place"] = MEDINC_BY_US_BY_RACE["Location"]
+
+# Sets the Query field
+MEDINC_BY_US_BY_RACE["Query Type"] = "Country"
+
+#**********************************************************************************************************
+#**********************************************************************************************************
+#**********************************************************************************************************
 
 # Define the geographies you want data on
 geographies = [('state', '*')]
@@ -45,7 +76,7 @@ MEDINC_BY_STATE_BY_RACE["Location"] = MEDINC_BY_STATE_BY_RACE.apply(lambda row: 
 MEDINC_BY_STATE_BY_RACE["Place"] = MEDINC_BY_STATE_BY_RACE["Location"]
 
 # Sets the Query field
-MEDINC_BY_STATE_BY_RACE["Query"] = "State"
+MEDINC_BY_STATE_BY_RACE["Query Type"] = "State"
 
 #**********************************************************************************************************
 #**********************************************************************************************************
@@ -74,7 +105,7 @@ def getState(place):
 MEDINC_BY_STATE_BY_PLACE_BY_RACE["Location"] = MEDINC_BY_STATE_BY_PLACE_BY_RACE["Place"].apply(lambda place: getState(place))
 
 # Sets the Query field
-MEDINC_BY_STATE_BY_RACE["Query"] = "Place"
+MEDINC_BY_STATE_BY_PLACE_BY_RACE["Query Type"] = "Place"
 
 #**********************************************************************************************************
 #**********************************************************************************************************
@@ -82,14 +113,20 @@ MEDINC_BY_STATE_BY_RACE["Query"] = "Place"
 
 # Combines the contents from the MEDINC_BY_STATE_BY_PLACE_BY_RACE data frame and 
 # MEDINC_BY_STATE_BY_RACE data frame into one data frame.
-MEDINC_BY_LOCATION_BY_PLACE_BY_RACE = MEDINC_BY_STATE_BY_PLACE_BY_RACE
-MEDINC_BY_LOCATION_BY_PLACE_BY_RACE = MEDINC_BY_STATE_BY_RACE.append(MEDINC_BY_STATE_BY_PLACE_BY_RACE, ignore_index = True)
+
+MEDINC_BY_LOCATION_BY_PLACE_BY_RACE = MEDINC_BY_US_BY_RACE
+MEDINC_BY_LOCATION_BY_PLACE_BY_RACE = MEDINC_BY_LOCATION_BY_PLACE_BY_RACE.append(MEDINC_BY_STATE_BY_RACE, ignore_index = True)
+MEDINC_BY_LOCATION_BY_PLACE_BY_RACE = MEDINC_BY_LOCATION_BY_PLACE_BY_RACE.append(MEDINC_BY_STATE_BY_PLACE_BY_RACE, ignore_index = True)
+
+#**********************************************************************************************************
+#**********************************************************************************************************
+#**********************************************************************************************************
 
 # Replaces -666666666 with NaN
 MEDINC_BY_LOCATION_BY_PLACE_BY_RACE = MEDINC_BY_LOCATION_BY_PLACE_BY_RACE.replace(-666666666, np.nan)
 
 # Choose the columns that you want to keep in the order you want them
-MEDINC_BY_LOCATION_BY_PLACE_BY_RACE = MEDINC_BY_LOCATION_BY_PLACE_BY_RACE.loc[:,['Location', 'Place', 'ALL', 'WHITE', 'BLACK', 'INDIAN', 'ASIAN', 'PACIFIC','OTHER', 'MIX', 'JUST WHITE', 'HISPANIC']]
+MEDINC_BY_LOCATION_BY_PLACE_BY_RACE = MEDINC_BY_LOCATION_BY_PLACE_BY_RACE.loc[:,['Query Type', 'Location', 'Place', 'ALL', 'WHITE', 'BLACK', 'INDIAN', 'ASIAN', 'PACIFIC','OTHER', 'MIX', 'JUST WHITE', 'HISPANIC']]
 
 # Creates a boolean series that returns true if all of the race fields are null and returns False otherwise.
 # This series will be used to subset the MEDINC_BY_LOCATION_BY_PLACE_BY_RACE by removing all records 
@@ -108,6 +145,10 @@ logic = \
         MEDINC_BY_LOCATION_BY_PLACE_BY_RACE["HISPANIC"] .isnull()
     )
 MEDINC_BY_LOCATION_BY_PLACE_BY_RACE = MEDINC_BY_LOCATION_BY_PLACE_BY_RACE[logic]
+
+#**********************************************************************************************************
+#**********************************************************************************************************
+#**********************************************************************************************************
 
 # Saves the contents of the MEDINC_BY_LOCATION_BY_PLACE_BY_RACE data frame to the 
 # MedIncomeData.csv csv file
