@@ -1,0 +1,4 @@
+bar graph showing actual medium income 
+Bar graph showing percent of all
+Table showing top areas in the state selected based on medium income
+Table showing areas where blacks rank in the top based on medium income.

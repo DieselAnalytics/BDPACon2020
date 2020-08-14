@@ -2,6 +2,9 @@
 import pandas as pd
 import numpy as np
 import censusdata
+import os
+
+os.chdir(r"C:\Users\ryanwade44\Documents\BDPACON2020X\vscode")
 
 # Put the variables that represent variables you want to retrieve
 # in a list
@@ -152,4 +155,4 @@ MEDINC_BY_LOCATION_BY_PLACE_BY_RACE = MEDINC_BY_LOCATION_BY_PLACE_BY_RACE[logic]
 
 # Saves the contents of the MEDINC_BY_LOCATION_BY_PLACE_BY_RACE data frame to the 
 # MedIncomeData.csv csv file
-MEDINC_BY_LOCATION_BY_PLACE_BY_RACE.to_csv("MedIncomeData.csv")
+MEDINC_BY_LOCATION_BY_PLACE_BY_RACE.to_csv("./Data/MedIncomeData.csv")
